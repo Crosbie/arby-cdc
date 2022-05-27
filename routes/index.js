@@ -3,19 +3,22 @@ var router = express.Router();
 var axios = require('axios');
 var async = require('async');
 
-var APP_URL = "https://price-api.crypto.com/price/v1/tokens?page=1&limit=20";
+var APP_URL = "https://price-api.crypto.com/price/v1/tokens?page=1&limit=50";
 var EXCHANGE_URL = "https://price-api.crypto.com/market/v1/token/SLUG/cdc-pair";
 var appPrices = [];
 var exchangePrices = [];
 var newList = [];
+
+axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.post['Content-Type'] ='application/json';
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   newList = [];
   getAppPrices(function(err,data){
 
-    async.each(appPrices,function(coin,cb){
-      getExchangePrice(coin,cb)
+    async.each(appPrices,function(coin,next){
+      getExchangePrice(coin,next)
       },
       function(err){
         console.log('DONE');
@@ -78,6 +81,10 @@ function getExchangePrice(coin,cb){
     coin.exPrice = res.data.quote_usd_price;
     coin.priceDiff = percentDiff(coin.appPrice, coin.exPrice);
     newList.push(coin);
+
+    if(coin.priceDiff >= 5){
+      console.log('5% diff on %d!!!!',coin.symbol);
+    }
 
     if(coin.exPrice > coin.appPrice){
       console.log('APP CHEAPER',coin.symbol);

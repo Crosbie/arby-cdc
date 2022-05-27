@@ -12,6 +12,7 @@ var newList = [];
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.post['Content-Type'] ='application/json';
 
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   newList = [];
@@ -39,7 +40,7 @@ function getAppPrices(cb){
 
 
   axios
-  .get(APP_URL)
+  .get(APP_URL, {withCredentials: false})
   .then(res => {
     console.log(`statusCode: ${res.status}`);
     console.log('Got '+ res.data.data.length + ' tickers');
